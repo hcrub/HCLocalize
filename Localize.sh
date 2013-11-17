@@ -43,9 +43,27 @@ CURRENT_DIRECTORY_PATH="${PWD}/Localized"
 # ##########################################################
 
 merge_en () {
+    
 	echo lang: "en"
-	mkdir ${CURRENT_DIRECTORY_PATH}/"en"
-	cp $LOCALIZED_FILENAME ${CURRENT_DIRECTORY_PATH}/"en"
+    
+    ldir=${CURRENT_DIRECTORY_PATH}/${SOURCE_LANGUAGE}".lproj"
+    lfile=${ldir}/${LOCALIZED_FILENAME}
+
+    if [ ! -d "$ldir" ] ; then
+        mkdir "$ldir"
+    else
+        rm -r "$ldir"
+        mkdir "$ldir"
+    fi
+
+    if [ ! -f "$lfile" ] ; then
+        touch "$lfile"
+    else
+        rm "$lfile"
+        touch "$lfile"
+    fi
+    
+	cp $LOCALIZED_FILENAME "$ldir"
 }
 
 # ##########################################################
@@ -61,6 +79,9 @@ mkdir -p $NEW_PATH
 lfile=${NEW_PATH}/${LOCALIZED_FILENAME}
 
 if [ ! -f "$lfile" ] ; then
+touch "$lfile"
+else
+rm "$lfile"
 touch "$lfile"
 fi
 
