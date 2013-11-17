@@ -44,7 +44,7 @@ CURRENT_DIRECTORY_PATH="${PWD}/Localized"
 
 merge_en () {
     
-	echo lang: "en"
+    echo lang: "en"
     
     ldir=${CURRENT_DIRECTORY_PATH}/${SOURCE_LANGUAGE}".lproj"
     lfile=${ldir}/${LOCALIZED_FILENAME}
@@ -63,7 +63,7 @@ merge_en () {
         touch "$lfile"
     fi
     
-	cp $LOCALIZED_FILENAME "$ldir"
+    cp $LOCALIZED_FILENAME "$ldir"
 }
 
 # ##########################################################
@@ -72,18 +72,18 @@ merge_en () {
 
 for lang in "${LANGUAGE_CODES[@]}"
 do
-echo lang: $lang
-NEW_PATH=${CURRENT_DIRECTORY_PATH}/${lang}".lproj"
-mkdir -p $NEW_PATH
+	echo lang: $lang
+	NEW_PATH=${CURRENT_DIRECTORY_PATH}/${lang}".lproj"
+	mkdir -p $NEW_PATH
 
-lfile=${NEW_PATH}/${LOCALIZED_FILENAME}
+	lfile=${NEW_PATH}/${LOCALIZED_FILENAME}
 
-if [ ! -f "$lfile" ] ; then
-touch "$lfile"
-else
-rm "$lfile"
-touch "$lfile"
-fi
+	if [ ! -f "$lfile" ] ; then
+		touch "$lfile"
+	else
+		rm "$lfile"
+		touch "$lfile"
+	fi
 
 while read p; do
 
@@ -102,7 +102,7 @@ set +o histexpand
 
 TRANSLATED=$(curl -s -A "Chrome" "http://translate.google.com.br/translate_a/t?client=t&text=${VALUE// /%20}&hl=pt-BR&sl=$SOURCE_LANGUAGE&tl=$lang&multires=1&ssel=0&tsel=0&sc=1" | iconv -f iso8859-1 -t utf-8 | awk -F'"' '{print $2}')
 
-TRANSLATED_FORMATTED=$(echo \"$KEY\" " = " \"$TRANSLATED\")
+TRANSLATED_FORMATTED=$(echo \"$KEY\" " = " \"$TRANSLATED\"";")
 
 # ##########################################################
 # Append to proper file
@@ -134,18 +134,19 @@ SRC_DIR="Localized/"
 DST_DIR="$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/Localized"
 COPY_HIDDEN=
 ORIG_IFS=$IFS
+
 IFS=$(echo -en "\n\b")
 
-if [[ ! -e "$SRC_DIR" ]]; then
-echo "Path does not exist: $SRC_DIR"
-exit 1
-fi
+	if [[ ! -e "$SRC_DIR" ]]; then
+		echo "Path does not exist: $SRC_DIR"
+		exit 1
+	fi
 
-if [[ -n $COPY_HIDDEN ]]; then
-alias do_find='find "$SRC_DIR"'
-else
-alias do_find='find -L "$SRC_DIR" -name ".*" -prune -o'
-fi
+	if [[ -n $COPY_HIDDEN ]]; then
+		alias do_find='find "$SRC_DIR"'
+	else
+		alias do_find='find -L "$SRC_DIR" -name ".*" -prune -o'
+	fi
 
 time (
 
@@ -164,8 +165,8 @@ rm -rf "$DST_DIR" \
 # ##########################################################
 
 for p in $(do_find -type d -print); do
-subpath="${p#$SRC_DIR}"
-mkdir "$DST_DIR$subpath" || exit 1
+	subpath="${p#$SRC_DIR}"
+	mkdir "$DST_DIR$subpath" || exit 1
 done
 
 # ##########################################################
@@ -173,14 +174,15 @@ done
 # ##########################################################
 
 for p in $(do_find -type l -print); do
-subpath="${p#$SRC_DIR}"
-source=$(readlink $SRC_DIR$subpath)
-sourcetype=$(stat -f "%HT%SY" $source)
-if [ "$sourcetype" = "Directory" ]; then
-mkdir "$DST_DIR$subpath" || exit 2
-else
-rsync -a "$source" "$DST_DIR$subpath" || exit 3
-fi
+	subpath="${p#$SRC_DIR}"
+	source=$(readlink $SRC_DIR$subpath)
+	sourcetype=$(stat -f "%HT%SY" $source)
+	
+	if [ "$sourcetype" = "Directory" ]; then
+		mkdir "$DST_DIR$subpath" || exit 2
+	else
+		rsync -a "$source" "$DST_DIR$subpath" || exit 3
+	fi
 done
 
 # ##########################################################
@@ -188,10 +190,11 @@ done
 # ##########################################################
 
 for p in $(do_find -type f -print); do
-subpath="${p#$SRC_DIR}"
-if ! ln "$SRC_DIR$subpath" "$DST_DIR$subpath" 2>/dev/null; then
-rsync -a "$SRC_DIR$subpath" "$DST_DIR$subpath" || exit 4
-fi
+	subpath="${p#$SRC_DIR}"
+	
+	if ! ln "$SRC_DIR$subpath" "$DST_DIR$subpath" 2>/dev/null; then
+		rsync -a "$SRC_DIR$subpath" "$DST_DIR$subpath" || exit 4
+	fi
 done
 
 )
